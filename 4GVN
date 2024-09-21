@@ -1,0 +1,210 @@
+import React from 'react';
+
+const Header = () => {
+  return (
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+  );
+};
+
+export default Header;
+ProductCard.js:
+
+jsx
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import React from 'react';
+
+const ProductCard = ({ product }) => {
+  return (
+    <div className="product-card">
+      <img src={product.image} alt={product.name} />
+      <h2>{product.name}</h2>
+      <p>{product.description}</p>
+      <p>Price: ${product.price}</p>
+      <button>Add to Cart</button>
+    </div>
+  );
+};
+
+export default ProductCard;
+ProductList.js:
+
+jsx
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import React, { useState, useEffect } from 'react';
+import ProductCard from './ProductCard';
+
+const ProductList = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // fetch products from API or database
+    const fetchProducts = async () => {
+      const response = await fetch('/api/products');
+      const data = await response.json();
+      setProducts(data);
+    };
+    fetchProducts();
+  }, []);
+
+  return (
+    <div className="product-list">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+};
+
+export default ProductList;
+Containers:
+
+App.js:
+
+jsx
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import React from 'react';
+import { Provider } from 'react-redux';
+import store from '../store';
+import ProductList from './ProductList';
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <ProductList />
+    </Provider>
+  );
+};
+
+export default App;
+ProductDetail.js:
+
+jsx
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import React from 'react';
+import { useSelector } from 'react-redux';
+import ProductCard from '../components/ProductCard';
+
+const ProductDetail = () => {
+  const product = useSelector((state) => state.product);
+
+  return (
+    <div className="product-detail">
+      <ProductCard product={product} />
+    </div>
+  );
+};
+
+export default ProductDetail;
+Actions:
+
+index.js:
+
+js
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+export * from './productActions';
+productActions.js:
+
+js
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+export const fetchProducts = () => async (dispatch) => {
+  const response = await fetch('/api/products');
+  const data = await response.json();
+  dispatch({ type: 'FETCH_PRODUCTS_SUCCESS', payload: data });
+};
+Reducers:
+
+index.js:
+
+js
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import { combineReducers } from 'redux';
+import productReducer from './productReducer';
+
+const rootReducer = combineReducers({
+  product: productReducer,
+});
+
+export default rootReducer;
+productReducer.js:
+
+js
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+const initialState = {
+  products: [],
+};
+
+const productReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'FETCH_PRODUCTS_SUCCESS':
+      return { ...state, products: action.payload };
+    default:
+      return state;
+  }
+};
+
+export default productReducer;
+Store:
+
+store.js:
+
+js
+
+Verify
+
+Open In Editor
+Edit
+Copy code
+import { createStore, combineReducers } from 'redux';
+import rootReducer from './reducers';
+
+const store = createStore(rootReducer);
+
+export default store;
